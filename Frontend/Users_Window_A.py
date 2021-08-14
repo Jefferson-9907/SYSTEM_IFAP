@@ -1,4 +1,5 @@
 # Import Modules
+import random
 from _datetime import datetime
 from tkinter import *
 from tkinter import messagebox, ttk
@@ -10,6 +11,7 @@ import Model_class.users_registration
 
 import Frontend.Principal_Window_A
 import Frontend.login_form
+import Frontend.Student_Window_A
 import Frontend.Matricula_Window_A
 import Frontend.Assesor_Window_A
 import Frontend.Course_Window_A
@@ -296,6 +298,32 @@ class Users:
 
         self.show_data_us()
 
+    def slider(self):
+        """
+            creates slides for heading by taking the text,
+            and that text are called after every 100 ms
+        """
+        if self.count >= len(self.txt):
+            self.count = -1
+            self.text = ''
+            self.heading.config(text=self.text)
+
+        else:
+            self.text = self.text + self.txt[self.count]
+            self.heading.config(text=self.text)
+        self.count += 1
+
+        self.heading.after(100, self.slider)
+
+    def heading_color(self):
+        """
+        configures heading label
+        :return: every 50 ms returned new random color.
+        """
+        fg = random.choice(self.color)
+        self.heading.config(fg=fg)
+        self.heading.after(50, self.heading_color)
+
     def add_us(self):
         try:
             obj_user_database = Model_class.users_registration.GetDatabase('use ddbb_sys_ifap;')
@@ -315,7 +343,8 @@ class Users:
                 # print(self.final_list)
                 # print(self.data_list)
         except BaseException as msg:
-            print(msg)
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)", f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                                                  f"REVISE LA CONEXIÓN: {msg}")
 
         if self.e_us.get() == "" or self.e_email.get() == "" or self.e_contr.get() == "" \
                 or self.e_tipo.get() == "":
@@ -358,7 +387,9 @@ class Users:
             self.show_data_us()
 
         except BaseException as msg:
-            messagebox.showerror("ERROR!!!", f"NO SE HAN PODIDO GUARDAR LOS DATOS DEL USUARIO {msg}")
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)",
+                                 f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                 f"REVISE LA CONEXIÓN: {msg}")
 
     def clear_field_us(self):
         self.id_us_1.set('')
@@ -427,7 +458,9 @@ class Users:
                 pass
 
         except BaseException as msg:
-            messagebox.showerror("Error", f"SE GENERÓ UN ERROR AL INTENTAR ELIMINAR DATOS DE UN USUARIO: {msg}")
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)",
+                                 f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                 f"REVISE LA CONEXIÓN: {msg}")
 
     def search_data_us(self):
         obj_user_database = Model_class.users_registration.GetDatabase('use ifap;')
@@ -456,7 +489,9 @@ class Users:
                 self.Table.insert('', END, values=data_list)
 
         except BaseException as msg:
-            print(msg)
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)",
+                                 f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                 f"REVISE LA CONEXIÓN: {msg}")
 
     def logout(self):
         root = Toplevel()

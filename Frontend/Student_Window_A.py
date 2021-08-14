@@ -532,30 +532,35 @@ class Student:
                 self.e_edad_al.get() == '' or self.e_direccion_al.get() == '' or self.e_correo_al.get() == '' or \
                 self.e_celular_al.get() == '' or self.e_telefono_al.get() == '' or self.e_representante_al.get() == '' \
                 or self.e_n_c_representante_al.get() == '' or self.e_observacion_al.get() == '':
-            messagebox.showerror("SYST_CONTROL(IFAP®)-->ERROR", "TODOS LOS CAMPOS SON OBLIGATORIOS!!!")
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)", "TODOS LOS CAMPOS SON OBLIGATORIOS!!!")
 
         else:
             self.update()
 
     def update(self):
-        self.connect = mariadb.connect(host="localhost", user="root", passwd="", database="ddbb_sys_ifap")
-        self.curr = self.connect.cursor()
+        try:
+            self.connect = mariadb.connect(host="localhost", user="root", passwd="", database="ddbb_sys_ifap")
+            self.curr = self.connect.cursor()
 
-        query = f"""UPDATE estudiantes SET id_estudiante="{self.e_cedula_al.get()}", 
-            nombres="{self.e_nombres_al.get()}", apellidos="{self.e_apellidos_al.get()}",\
-            edad="{self.e_edad_al.get()}", direccion="{self.e_direccion_al.get()}", correo="{self.e_correo_al.get()}",\
-            celular="{self.e_celular_al.get()}", telefono="{self.e_telefono_al.get()}",
-            representante="{self.e_representante_al.get()}", cedula_r="{self.e_n_c_representante_al.get()}", 
-            observacion="{self.e_observacion_al.get()}" WHERE id_estudiante={self.e_cedula_al_1.get()}"""
+            query = f"""UPDATE estudiantes SET id_estudiante="{self.e_cedula_al.get()}", 
+                nombres="{self.e_nombres_al.get()}", apellidos="{self.e_apellidos_al.get()}",\
+                edad="{self.e_edad_al.get()}", direccion="{self.e_direccion_al.get()}", correo="{self.e_correo_al.get()}",\
+                celular="{self.e_celular_al.get()}", telefono="{self.e_telefono_al.get()}",
+                representante="{self.e_representante_al.get()}", cedula_r="{self.e_n_c_representante_al.get()}", 
+                observacion="{self.e_observacion_al.get()}" WHERE id_estudiante={self.e_cedula_al_1.get()}"""
 
-        self.curr.execute(query)
-        self.connect.commit()
-        self.show_data()
-        messagebox.showinfo("SYST_CONTROL(IFAP®)", f"DATOS DEL ESTUDIANTE: {self.e_nombres_al.get()}"
-                                                   f"{self.e_apellidos_al.get()}\n"
-                                                   f"CON No. DE CÉDULA: {self.e_cedula_al.get()}\n"
-                                                   f"HAN SIDO ACTUALIZADOS DEL REGISTRO")
-        self.clear_field()
+            self.curr.execute(query)
+            self.connect.commit()
+            self.show_data()
+            messagebox.showinfo("SYST_CONTROL(IFAP®)-->(ÉXITO)", f"DATOS DEL ESTUDIANTE: {self.e_nombres_al.get()}"
+                                                       f"{self.e_apellidos_al.get()}\n"
+                                                       f"CON No. DE CÉDULA: {self.e_cedula_al.get()}\n"
+                                                       f"HAN SIDO ACTUALIZADOS DEL REGISTRO")
+            self.clear_field()
+
+        except BaseException as msg:
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)", f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                                                  f"REVISE LA CONEXIÓN: {msg}")
 
     def delete(self):
         try:
@@ -564,11 +569,11 @@ class Student:
 
             tree_view_content = self.Table.focus()
             tree_view_items = self.Table.item(tree_view_content)
-            tree_view_values = tree_view_items['values'][1] + " " + tree_view_items['values'][2]
+            tree_view_values = tree_view_items['values'][0]
             ask = messagebox.askyesno("SYST_CONTROL(IFAP®) (CONFIRMACIÓN ELIMINAR)",
                                       f"DESEA ELIMINAR AL ESTUDIANTE: {tree_view_values}")
             if ask is True:
-                query = "delete from estudiantes where nombres=%s;"
+                query = "delete from estudiantes where id_matricula=%s;"
                 self.db_connection.delete(query, tree_view_values)
                 messagebox.showinfo("SYST_CONTROL(IFAP®)", f"DATOS DEL ESTUDIANTE: {tree_view_values} "
                                                            f"ELIMINADOS DEL REGISTRO CORRECTAMENTE!!!")
@@ -578,7 +583,8 @@ class Student:
                 pass
 
         except BaseException as msg:
-            messagebox.showerror("Error", f"SE GENERÓ UN ERROR AL INTENTAR ELIMINAR DATOS DE UN ESTUDIANTE: {msg}")
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)", f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                                                  f"REVISE LA CONEXIÓN: {msg}")
 
     # =======================================================================
     # ========================Searching Started==============================
@@ -673,7 +679,9 @@ class Student:
                                 self.search_entry.set("")
 
                     except BaseException as msg:
-                        print(msg)
+                        messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)",
+                                             f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                             f"REVISE LA CONEXIÓN: {msg}")
                 else:
                     self.show_data()
         else:
@@ -694,7 +702,9 @@ class Student:
                 self.Table.insert('', END, values=data_list)
 
         except BaseException as msg:
-            print(msg)
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)",
+                                 f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                 f"REVISE LA CONEXIÓN: {msg}")
 
     def logout(self):
         root = Toplevel()

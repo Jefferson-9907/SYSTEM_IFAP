@@ -414,8 +414,6 @@ class Paralelo:
 
         self.show_data_par()
 
-
-
     def pick_date_i(self, event):
         """
             left click event is being handled when trying to add DOB
@@ -500,7 +498,9 @@ class Paralelo:
                 self.paralelos_list.append(paralelo_data_list)
 
         except BaseException as msg:
-            messagebox.showerror("Error", f"{msg}")
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)",
+                                 f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                 f"REVISE LA CONEXIÓN: {msg}")
 
         if self.e_id_paralelo == '' or self.e_nombre_curso == '' or self.e_nom_par.get() == '' or \
                 self.e_dia.get() == '' or self.e_hora.get() == '' or self.e_f_i_par == '' or \
@@ -541,7 +541,9 @@ class Paralelo:
             self.show_data_par()
 
         except BaseException as msg:
-            messagebox.showerror("ERROR!!!", f"NO SE HAN PODIDO GUARDAR LOS DATOS DEL PARALELO {msg}")
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)",
+                                 f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                 f"REVISE LA CONEXIÓN: {msg}")
 
     def clear_field_par(self):
         self.e_id_paralelo_1.set('')
@@ -605,7 +607,9 @@ class Paralelo:
             self.clear_field_par()
 
         except BaseException as msg:
-            messagebox.showerror("ERROR!!!", f"NO SE HAN PODIDO ACTUALIZAR LOS DATOS DEL CURSO: {msg}")
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)",
+                                 f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                 f"REVISE LA CONEXIÓN: {msg}")
             self.clear_field_par()
 
     def delete_par(self):
@@ -629,7 +633,9 @@ class Paralelo:
                 pass
 
         except BaseException as msg:
-            messagebox.showerror("Error", f"SE GENERÓ UN ERROR AL INTENTAR ELIMINAR DATOS DE UN PARALELO: {msg}")
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)",
+                                 f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                 f"REVISE LA CONEXIÓN: {msg}")
 
     # =======================================================================
     # ========================Searching Started==============================
@@ -721,7 +727,9 @@ class Paralelo:
                                 self.search_field_par.set("")
 
                     except BaseException as msg:
-                        print(msg)
+                        messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)",
+                                             f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                             f"REVISE LA CONEXIÓN: {msg}")
                 else:
                     self.search_data_par()
         else:
@@ -743,7 +751,9 @@ class Paralelo:
                 self.Table_par.insert('', END, values=data_list)
 
         except BaseException as msg:
-            print(msg)
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)",
+                                 f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                 f"REVISE LA CONEXIÓN: {msg}")
 
     def logout(self):
         root = Toplevel()

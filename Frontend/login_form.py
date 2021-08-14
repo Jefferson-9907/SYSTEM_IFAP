@@ -1,13 +1,17 @@
 import random
-from datetime import datetime
+import time
+from datetime import datetime, date
 from tkinter import *
 import mariadb
 from PIL import ImageTk
 from ttkthemes import themed_tk as tk
+
 import Frontend.connect_database
 import Model_class.database_connected
+import Model_class.auditoria_u_registration
 import Frontend.database_connected
 import Backend.connection
+
 from tkinter import messagebox
 from Principal_Window_A import Principal
 from Principal_Window_F import Principal_F
@@ -172,92 +176,130 @@ class Login:
         self.heading.after(50, self.heading_color)
 
     def validation(self):
-        """
-            Valida si las entradas de nombre de usuario/correo electrónico existen en la base de datos o no, si
-            existen y coinciden con el usuario contraseña, les permite iniciar sesión llamando a otro método,
-            BaseException se maneja con el fin de evitar cualquier error en tiempo de ejecución
-        """
-        obj_admin_database = Model_class.database_connected.GetDatabase('use ddbb_sys_ifap;')
-        self.db_connection.create(obj_admin_database.get_database())
-        query = "select * from usuarios where usuario = %s OR email= %s;"
-        data = self.db_connection.search(query, (self.username_entry.get(), self.username_entry.get()))
+        try:
+            """
+                Valida si las entradas de nombre de usuario/correo electrónico existen en la base de datos o no, si
+                existen y coinciden con el usuario contraseña, les permite iniciar sesión llamando a otro método,
+                BaseException se maneja con el fin de evitar cualquier error en tiempo de ejecución
+            """
+            obj_admin_database = Model_class.database_connected.GetDatabase('use ddbb_sys_ifap;')
+            self.db_connection.create(obj_admin_database.get_database())
+            query = "select * from usuarios where usuario = %s OR email= %s;"
+            data = self.db_connection.search(query, (self.username_entry.get(), self.username_entry.get()))
 
-        self.f_username = []
-        self.f_password = []
-        self.f_email = []
-        for values in data:
-            current_list = values[2]
-            f_username_list = values[1]
-            f_password_list = values[3]
-            f_email_list = values[2]
-            self.f_email.append(f_email_list)
-            self.f_username.append(f_username_list)
-            self.f_password.append(f_password_list)
-            Login.current_user.clear()
-            Login.current_user.append(current_list)
+            self.f_username = []
+            self.f_password = []
+            self.f_email = []
+            for values in data:
+                current_list = values[2]
+                f_username_list = values[1]
+                f_password_list = values[3]
+                f_email_list = values[2]
+                self.f_email.append(f_email_list)
+                self.f_username.append(f_username_list)
+                self.f_password.append(f_password_list)
+                # Login.current_user.clear()
+                Login.current_user.append(current_list)
 
-        if self.username_entry.get() == "":
-            messagebox.showerror("SYST_CONTROL(IFAP®)-->ERROR", "POR FAVOR INGRESE SU USUARIO")
-        elif self.password_entry.get() == "":
-            messagebox.showerror("SYST_CONTROL(IFAP®)-->ERROR", "POR FAVOR INGRESE SU CONTRASEÑA")
+            if self.username_entry.get() == "":
+                messagebox.showerror("SYST_CONTROL(IFAP®)-->ERROR", "POR FAVOR INGRESE SU USUARIO")
 
-        else:
-            self.connect = mariadb.connect(host="localhost", user="root", passwd="", database="ddbb_sys_ifap")
-            self.curr = self.connect.cursor()
-            sql = "SELECT contrasena FROM usuarios WHERE usuario='" + self.username_entry.get() + "' and contrasena='" \
-                  + self.password_entry.get() + "'"
-            self.curr.execute(sql)
-            self.curr.fetchall()
+            elif self.password_entry.get() == "":
+                messagebox.showerror("SYST_CONTROL(IFAP®)-->ERROR", "POR FAVOR INGRESE SU CONTRASEÑA")
 
-            if self.curr.rowcount == 1:
-                sql = "SELECT * FROM usuarios WHERE usuario='" + self.username_entry.get() + "' and contrasena='" \
-                      + self.password_entry.get() + "' and tipo='Administrador'"
+            else:
+                self.accion = "INGRESO (USUARIO ADMIN)"
+                self.fecha = datetime.now().date()
+                self.hora = datetime.now().time()
+
+                self.connect = mariadb.connect(host="localhost", user="root", passwd="", database="ddbb_sys_ifap")
+                self.curr = self.connect.cursor()
+                sql = "SELECT contrasena FROM usuarios WHERE usuario='" + self.username_entry.get() + "' and " \
+                                                                                                      "contrasena='" \
+                      + self.password_entry.get() + "'"
                 self.curr.execute(sql)
                 self.curr.fetchall()
+
                 if self.curr.rowcount == 1:
-
-                    root = Toplevel()
-                    Principal(root)
-                    self.root.withdraw()
-                    root.deiconify()
-
-                else:
                     sql = "SELECT * FROM usuarios WHERE usuario='" + self.username_entry.get() + "' and contrasena='" \
-                          + self.password_entry.get() + "' and tipo='Secretaría'"
+                          + self.password_entry.get() + "' and tipo='Administrador'"
                     self.curr.execute(sql)
                     self.curr.fetchall()
                     if self.curr.rowcount == 1:
-                        self.root.destroy()
+                        self.audi_users()
 
-                        st_root = Tk()
-                        Principal_S(st_root)
-                        st_root.mainloop()
+                        root = Toplevel()
+                        Principal(root)
+                        self.root.withdraw()
+                        root.deiconify()
 
                     else:
-                        sql = "SELECT * FROM usuarios WHERE usuario='" + self.username_entry.get() + "' and " \
-                                                                                                     "contrasena='" \
-                              + self.password_entry.get() + "' and tipo='Caja'"
+                        sql = "SELECT * FROM usuarios WHERE usuario='" + self.username_entry.get() + "' and contrasena='" \
+                              + self.password_entry.get() + "' and tipo='Secretaría'"
                         self.curr.execute(sql)
                         self.curr.fetchall()
-
                         if self.curr.rowcount == 1:
                             self.root.destroy()
 
                             st_root = Tk()
-                            Principal_F(st_root)
+                            Principal_S(st_root)
                             st_root.mainloop()
 
                         else:
-                            pass
+                            sql = "SELECT * FROM usuarios WHERE usuario='" + self.username_entry.get() + "' and " \
+                                                                                                         "contrasena='" \
+                                  + self.password_entry.get() + "' and tipo='Caja'"
+                            self.curr.execute(sql)
+                            self.curr.fetchall()
 
-            else:
-                messagebox.showerror("SYST_CONTROL(IFAP®)-->ERROR", "CREDENCIALES INCORRECTAS!!!")
-                self.username_entry.delete(0, END)
-                self.password_entry.delete(0, END)
-                self.username_entry.focus()
+                            if self.curr.rowcount == 1:
+                                self.root.destroy()
+
+                                st_root = Tk()
+                                Principal_F(st_root)
+                                st_root.mainloop()
+
+                            else:
+                                pass
+                else:
+                    messagebox.showerror("SYST_CONTROL(IFAP®)-->ERROR", "CREDENCIALES INCORRECTAS,\n"
+                                                                        "INTÉNTELO NUEVAMNETE")
+                    self.accion = "CREDENCIALES INCORRECTAS"
+                    self.audi_users()
+                    self.username_entry.delete(0, END)
+                    self.password_entry.delete(0, END)
+                    self.username_entry.focus()
+
+        except BaseException as msg:
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)", f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                                                  f"REVISE LA CONEXIÓN: {msg}")
 
     def audi_users(self):
-        pass
+        try:
+            obj_aud_user_database = Model_class.auditoria_u_registration.GetDatabase('use ddbb_sys_ifap;')
+            self.db_connection.create(obj_aud_user_database.get_database())
+
+            obj_aud_user_database = Model_class.auditoria_u_registration.AuditoriaRegistration(
+                self.username_entry.get(),
+                self.accion,
+                self.fecha,
+                self.hora
+            )
+            query = 'insert into auditoria_usuarios (usuario, accion, fecha, hora) values (%s, %s, %s, %s);'
+            values = (obj_aud_user_database.get_usuario(), obj_aud_user_database.get_accion(),
+                      obj_aud_user_database.get_fecha(), obj_aud_user_database.get_hora()
+                      )
+
+            self.db_connection.insert(query, values)
+            messagebox.showinfo("SYST_CONTROL(IFAP®)", f"REGISTRO (USUARIOS)\n"
+                                                       f"USUARIO: {self.username_entry.get()}\n"
+                                                       f"ACCIÓN: {self.accion}\n"
+                                                       f"FECHA: {self.fecha}\n"
+                                                       f"HORA: {self.hora}")
+
+        except BaseException as msg:
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)", f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                                                  f"REVISE LA CONEXIÓN: {msg}")
 
     def click_database(self):
         """"

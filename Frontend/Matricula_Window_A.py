@@ -267,8 +267,7 @@ class Matricula:
         self.add_btn.grid(row=0, column=1, padx=3, pady=10)
         self.add_btn["state"] = "normal"
 
-        self.up_btn = Button(self.btn_frame_m, image=self.imagenes['editar'], text='MODIFICAR', width=80,
-                             command=self.update_m, compound=TOP)
+        self.up_btn = Button(self.btn_frame_m, image=self.imagenes['editar'], text='MODIFICAR', width=80, compound=TOP)
         self.up_btn.image = self.imagenes['editar']
         self.up_btn.grid(row=0, column=2, padx=3, pady=10)
         self.up_btn["state"] = "disabled"
@@ -462,7 +461,8 @@ class Matricula:
             self.clear_field_m()
 
         except BaseException as msg:
-            messagebox.showerror("ERROR!!!", f"NO SE HAN PODIDO GUARDAR LOS DATOS DE LA MATRÍCULA {msg}")
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)", f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                                                  f"REVISE LA CONEXIÓN: {msg}")
 
     def clear_field_m(self):
         self.e_n_mat_al_m.set('')
@@ -501,7 +501,8 @@ class Matricula:
                 self.matriculas_list.append(n_c_i)
 
         except BaseException as msg:
-            messagebox.showerror("Error", f"{msg}")
+            messagebox.showerror("SYST_CONTROL(IFAP®)-->(ERROR)", f"NO FUÉ POSIBLE CONECTARSE CON EL SERVIDOR,\n"
+                                                                  f"REVISE LA CONEXIÓN: {msg}")
 
         if self.e_n_mat_al_m.get() == '' or self.e_nombres_al.get() == '' or self.e_n_paralelo.get() == '' or \
                 self.e_nombres_as.get() == '':
